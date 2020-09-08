@@ -32,9 +32,9 @@ fn main() {
         .subcommand(App::new("version")
             .about("gets the current cargo rune version"));
 
-    let command_match = match std::env::args_os().nth(0) {
+    let command_match = match std::env::args_os().nth(1) {
         Some(ref inner) => match inner.to_str() {
-            Some("cargo") => get_matches_from_mut(&mut cli, std::env::args_os().skip(1)),
+            Some("rune") => get_matches_from_mut(&mut cli, std::env::args_os().skip(1)),
             _ => get_matches_from_mut(&mut cli, std::env::args_os())
         },
         None => get_matches_from_mut(&mut cli, std::env::args_os())
