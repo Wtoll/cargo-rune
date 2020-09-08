@@ -1,7 +1,7 @@
 [package]
 name = "cargo-rune"
 description = "A Cargo extension for the Rune language with some helpful tools"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Will Toll <will@wtoll.com>"]
 edition = "2018"
 documentation = "https://docs.rs/cargo-rune"
