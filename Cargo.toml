@@ -4,13 +4,19 @@ description = "A Cargo extension for the Rune language with some helpful tools"
 version = "0.1.0"
 authors = ["Will Toll <will@wtoll.com>"]
 edition = "2018"
+documentation = "https://docs.rs/cargo-rune"
+readme = "README.md"
+homepage = "https://crates.io/crates/cargo-rune"
+repository = "https://github.com/Wtoll/cargo-rune"
+license = "MIT"
+keywords = ["rune", "language", "scripting", "cargo"]
+include = ["src/", "LICENSE", "README.md", "COPYRIGHT", "build.rs"]
 
 build = "build.rs"
 
 [dependencies]
 clap = "3.0.0-beta.1"
 
-tokio = {version = "0.2.22", features = ["rt-core", "net", "fs", "macros"]}
 rune = "0.6.16"
 runestick = "0.6.16"
 
