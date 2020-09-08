@@ -5,11 +5,13 @@ use clap::App;
 
 fn main() {
     let authors = env!("CARGO_PKG_AUTHORS").replace(':', "\n");
+    let version = format!("{} ({} {})", env!("CARGO_PKG_VERSION"), version::get(), date::get());
 
     let mut cli = App::new("Cargo Rune")
         .bin_name("cargo rune")
         .author(&*authors)
         .version(env!("CARGO_PKG_VERSION"))
+        .long_version(&*version)
         .about(env!("CARGO_PKG_DESCRIPTION"))
         .subcommand(App::new("run")
             .name("run")
@@ -24,7 +26,7 @@ fn main() {
         Some(contents) => match contents {
             "run" => subcommands::run(),
             "version" => {
-                cli.write_version(&mut io::stdout()).expect("failed to write to stdout");
+                cli.write_long_version(&mut io::stdout()).expect("failed to write to stdout");
                 println!();
             },
             _ => {}
@@ -34,3 +36,5 @@ fn main() {
 }
 
 mod subcommands;
+mod version;
+mod date;
