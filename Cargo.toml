@@ -10,6 +10,10 @@ build = "build.rs"
 [dependencies]
 clap = "3.0.0-beta.1"
 
+tokio = {version = "0.2.22", features = ["rt-core", "net", "fs", "macros"]}
+rune = "0.6.16"
+runestick = "0.6.16"
+
 [build-dependencies]
 git2 = "0.13.10"
 chrono = "0.4"

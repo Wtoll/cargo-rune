@@ -11,8 +11,6 @@ extern crate chrono;
 use chrono::Utc;
 
 fn main() {
-
-
     let desc = Repository::discover(".").unwrap().describe(&DescribeOptions::new().describe_tags().show_commit_oid_as_fallback(true)).unwrap().format(None).unwrap();
     write_value("version.rs", "VERSION", desc).expect("Writing commit hash");
 

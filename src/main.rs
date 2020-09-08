@@ -1,11 +1,11 @@
 use std::io;
 
 extern crate clap;
-use clap::App;
+use clap::{App, Arg, AppSettings};
 
 fn main() {
     let authors = env!("CARGO_PKG_AUTHORS").replace(':', "\n");
-    let version = format!("{} ({} {})", env!("CARGO_PKG_VERSION"), version::get(), date::get());
+    let version = format!("{} ({} {})", env!("CARGO_PKG_VERSION"), build_params::version::get(), build_params::date::get());
 
     let mut cli = App::new("Cargo Rune")
         .bin_name("cargo rune")
@@ -13,28 +13,36 @@ fn main() {
         .version(env!("CARGO_PKG_VERSION"))
         .long_version(&*version)
         .about(env!("CARGO_PKG_DESCRIPTION"))
+        .setting(AppSettings::VersionlessSubcommands)
+        .arg(Arg::with_name("PATH")
+            .about("the path to a rune script to run")
+            .default_value("src/main.rn")
+            .hide_default_value(true)
+            .required(true)
+            .index(1))
         .subcommand(App::new("run")
-            .name("run")
-            .about("runs a rune script"))
+            .about("runs a rune script")
+            .arg(Arg::with_name("PATH")
+                .about("the path to a rune script to run")
+                .default_value("src/main.rn")
+                .hide_default_value(true)
+                .required(true)
+                .index(1)))
         .subcommand(App::new("version")
-            .name("version")
             .about("gets the current cargo rune version"));
 
     let command_match = cli.get_matches_mut();
 
-    match command_match.subcommand_name() {
-        Some(contents) => match contents {
-            "run" => subcommands::run(),
-            "version" => {
-                cli.write_long_version(&mut io::stdout()).expect("failed to write to stdout");
-                println!();
-            },
-            _ => {}
+    match command_match.subcommand() {
+        ("", None) => subcommands::run::main(command_match.value_of("PATH").unwrap()),
+        ("run", Some(sub)) => subcommands::run::main(sub.value_of("PATH").unwrap()),
+        ("version", Some(_)) => {
+            cli.write_long_version(&mut io::stdout()).expect("failed to write to stdout");
+            println!();
         },
-        None => subcommands::run()
+        (_, _) => {}
     }
 }
 
 mod subcommands;
-mod version;
-mod date;
+mod build_params;
