@@ -32,10 +32,12 @@ fn main() {
         .subcommand(App::new("version")
             .about("gets the current cargo rune version"));
 
-    let command_match = if cfg!(debug_assertions) {
-        get_matches_from_mut(&mut cli, std::env::args_os())
-    } else {
-        get_matches_from_mut(&mut cli, std::env::args_os().skip(1))
+    let command_match = match std::env::args_os().nth(0) {
+        Some(ref inner) => match inner.to_str() {
+            Some("cargo") => get_matches_from_mut(&mut cli, std::env::args_os().skip(1)),
+            _ => get_matches_from_mut(&mut cli, std::env::args_os())
+        },
+        None => get_matches_from_mut(&mut cli, std::env::args_os())
     };
 
     match command_match.subcommand() {
