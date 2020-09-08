@@ -1,4 +1,5 @@
 use std::io;
+use std::ffi::OsString;
 
 extern crate clap;
 use clap::{App, Arg, AppSettings};
@@ -31,7 +32,11 @@ fn main() {
         .subcommand(App::new("version")
             .about("gets the current cargo rune version"));
 
-    let command_match = cli.get_matches_mut();
+    let command_match = if cfg!(debug_assertions) {
+        get_matches_from_mut(&mut cli, std::env::args_os())
+    } else {
+        get_matches_from_mut(&mut cli, std::env::args_os().skip(1))
+    };
 
     match command_match.subcommand() {
         ("", None) => subcommands::run::main(command_match.value_of("PATH").unwrap()),
@@ -46,3 +51,14 @@ fn main() {
 
 mod subcommands;
 mod build_params;
+
+fn get_matches_from_mut<I, T>(app: &mut App, itr: I) -> clap::ArgMatches
+where
+    I: IntoIterator<Item = T>,
+    T: Into<OsString> + Clone,
+{
+    app.try_get_matches_from_mut(itr)
+        .unwrap_or_else(|e| {
+            e.exit()
+        })
+}
