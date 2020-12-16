@@ -1,0 +1,5 @@
+Config {
+    "rune": "0.7.0",
+    "runestick": "0.7.0",
+    "main": "src/main.rn"
+}

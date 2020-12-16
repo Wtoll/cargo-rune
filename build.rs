@@ -1,46 +1,100 @@
-use git2::{Repository, DescribeOptions};
+use std::{
+    fs::{
+        File
+    },
+    io::{
+        BufWriter,
+        Read,
+        Write
+    },
+    path::{
+        PathBuf,
+        Path
+    }
+};
 
-use std::env;
-use std::convert::AsRef;
-use std::fs::{File, create_dir_all};
-use std::io::{Write, Read, BufWriter, Error, ErrorKind};
-use std::path::Path;
-use std::string::ToString;
+use git2::{
+    Repository,
+    DescribeOptions
+};
 
-extern crate chrono;
-use chrono::Utc;
+fn main() -> Result<(), Error> {
+    // Get the build directory from the environment arguments
+    let build_path: PathBuf = std::env::var_os("OUT_DIR")
+        .ok_or(Error::InvalidBuildPath)?.into();
 
-fn main() {
-    let desc = Repository::discover(".").unwrap().describe(&DescribeOptions::new().describe_tags().show_commit_oid_as_fallback(true)).unwrap().format(None).unwrap();
-    write_value("version.rs", "VERSION", desc).expect("Writing commit hash");
+    // Make sure the build directory exists
+    std::fs::create_dir_all(&build_path)
+        .or(Err(Error::CreateDirectory))?;
 
-    write_value("date.rs", "DATE", Utc::now().format("%Y-%m-%d")).expect("Writing date");
+    // Write the date to the date file
+    write_to_file(build_path.join("date.txt"), chrono::Utc::now().format("%Y-%m-%d"))?;
+
+    // Get the repository object for the current folder
+    let repository = Repository::discover(".")
+        .or(Err(Error::MissingRepository))?;
+
+    // Get the current description of the repository
+    let description = repository.describe(DescribeOptions::new()
+            .describe_tags()
+            .show_commit_oid_as_fallback(true))
+        .or(Err(Error::RepositoryDescription))?;
+
+    // Format the description to a string
+    let commit = description.format(None).or(Err(Error::CommitFormatError))?;
+
+    // Write the commit hash to the commit hash file
+    write_to_file(build_path.join("commit.txt"), commit)?;
+
+    Ok(())
 }
 
-pub fn write_value<P: AsRef<Path>, S: ToString>(dir: P, var_name: &'static str, value: S) -> Result<(), Error> {
-    let path = env::var_os("OUT_DIR").ok_or(Error::new(ErrorKind::Other, "Idk"))?;
-    let path: &Path = path.as_ref();
+fn write_to_file<P: AsRef<Path>, S: ToString>(path: P, content: S) -> Result<(), Error> {
 
-    create_dir_all(path)?;
+    let content: String = content.to_string();
 
-    let path = path.join(dir);
+    let current = if path.as_ref().exists() {
+        // Open the file
+        let mut file = File::open(&path)
+            .or(Err(Error::InvalidFile))?;
 
-    let content = format!("static {}: &'static str = \"{}\";\n", var_name, value.to_string());
+        let mut current_content = String::new();
+        // Read it's contents
+        file.read_to_string(&mut current_content)
+            .or(Err(Error::FileRead))?;
 
-    let is_fresh = if path.exists() {
-        let mut f = File::open(&path)?;
-        let mut current = String::new();
-        f.read_to_string(&mut current)?;
+        // And set the variable equal to whether or not
+        // the file already has the right information
+        current_content == content
 
-        current == content
     } else {
         false
     };
 
-    if !is_fresh {
-      let mut file = BufWriter::new(File::create(&path)?);
+    // If the current content in the file is not up to date
+    if !current {
+        // Overwrite the file
+        let mut file = BufWriter::new(
+            File::create(&path)
+                .or(Err(Error::InvalidFile))?
+        );
 
-      write!(file, "{}", content)?;
+        // With the correct information
+        file.write_all(content.as_bytes())
+            .or(Err(Error::FileWrite))?
     }
+
     Ok(())
+}
+
+#[derive(Debug)]
+enum Error {
+    InvalidBuildPath,
+    CreateDirectory,
+    InvalidFile,
+    FileRead,
+    FileWrite,
+    MissingRepository,
+    RepositoryDescription,
+    CommitFormatError
 }

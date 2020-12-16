@@ -1,25 +1,36 @@
 [package]
+
 name = "cargo-rune"
-description = "A Cargo extension for the Rune language with some helpful tools"
-version = "0.1.4"
-authors = ["Will Toll <will@wtoll.com>"]
 edition = "2018"
-documentation = "https://docs.rs/cargo-rune"
+version = "0.2.0"
+description = "Rune's CLI tool"
+authors = ["Will Toll <will@wtoll.com>"]
+
+license = "MIT or Apache-2.0"
 readme = "README.md"
+
+documentation = "https://docs.rs/cargo-rune"
 homepage = "https://crates.io/crates/cargo-rune"
 repository = "https://github.com/Wtoll/cargo-rune"
-license = "MIT"
-keywords = ["rune", "language", "scripting", "cargo"]
-include = ["src/", "LICENSE", "README.md", "COPYRIGHT", "build.rs", ".git"]
 
-build = "build.rs"
+keywords = ["rune", "language", "scripting", "cargo"]
+
+exclude = ["/run"]
 
 [dependencies]
-clap = "3.0.0-beta.1"
 
+clap = { package = "clap-v3", version = "3.0.0-beta.1" }
+git2 = "0.13.12"
+indoc = "1.0"
+log = "0.4.11"
+ron = "0.6.2"
 rune = "0.6.16"
 runestick = "0.6.16"
+semver = { version = "0.11.0", features = ["serde"] }
+serde = { version = "1.0.118", features = ["derive"] }
+termcolor = "1.1.2"
 
 [build-dependencies]
-git2 = "0.13.10"
-chrono = "0.4"
+
+chrono = "0.4.19"
+git2 = "0.13.12"
