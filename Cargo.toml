@@ -1,0 +1,12 @@
+[package]
+name = "cargo-rune"
+version = "0.2.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+clio = { version = "0", features = ["clap-parse"] } 
+lazy_static = "1"
+rune = "0"
+termcolor = "1"
+tokio = { version = "1", features = ["full"] }
