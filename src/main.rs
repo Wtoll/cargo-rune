@@ -1,11 +1,8 @@
-use clap::Parser;
-
 mod cli;
 mod rune;
 
 fn main() {
-    let cargo = cli::CargoCli::parse();
-    let cli::CargoCommands::Rune(args) = cargo.command;
+    let args = cli::parse();
 
     let command = args.command.or_else(|| {
         args.run_args.map(|inner| cli::Commands::Run(inner))

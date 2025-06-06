@@ -1,32 +1,27 @@
-use clap::{Parser, Subcommand, Args};
+use std::{env, ffi::OsString};
+
+use clap::{Parser, Subcommand};
 use clio::Input;
 
-pub const CLAP_STYLING: clap::builder::styling::Styles = clap::builder::styling::Styles::styled()
-    .header(clap_cargo::style::HEADER)
-    .usage(clap_cargo::style::USAGE)
-    .literal(clap_cargo::style::LITERAL)
-    .placeholder(clap_cargo::style::PLACEHOLDER)
-    .error(clap_cargo::style::ERROR)
-    .valid(clap_cargo::style::VALID)
-    .invalid(clap_cargo::style::INVALID);
+pub fn parse() -> Cli {
+    let mut args: Vec<OsString> = env::args_os().collect();
+    let args = if args.get(1).map(|arg| arg == "rune").unwrap_or_default() {
+        // ["/bin/cargo-rune", "rune", ...] -> ["rune", "/bin/cargo-rune", ...] -> ["/bin/cargo-rune", ...]
+        args.swap(0, 1);
+        let mut args = args.into_iter();
+        drop(args.next().unwrap());
+
+        args
+    } else {
+        args.into_iter()
+    };
+
+    Cli::parse_from(args)
+}
 
 #[derive(Parser, Debug)]
-#[command(name = "cargo")]
-#[command(bin_name = "cargo")]
-#[command(styles = CLAP_STYLING)]
-pub struct CargoCli {
-    #[command(subcommand)]
-    pub command: CargoCommands
-}
-
-#[derive(Subcommand, Debug)]
-pub enum CargoCommands {
-    Rune(CargoRune)
-}
-
-#[derive(Args, Debug)]
 #[command(args_conflicts_with_subcommands = true)]
-pub struct CargoRune {
+pub struct Cli {
     #[command(subcommand)]
     pub command: Option<Commands>,
 
