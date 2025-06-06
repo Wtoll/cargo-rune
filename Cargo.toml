@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
+clap-cargo = "0.15.2"
 clio = { version = "0", features = ["clap-parse"] } 
 lazy_static = "1"
 rune = "0"

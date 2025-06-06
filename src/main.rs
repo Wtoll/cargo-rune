@@ -4,16 +4,14 @@ mod cli;
 mod rune;
 
 fn main() {
-    let args = cli::Cli::parse();
+    let cargo = cli::CargoCli::parse();
+    let cli::CargoCommands::Rune(args) = cargo.command;
 
     let command = args.command.or_else(|| {
         args.run_args.map(|inner| cli::Commands::Run(inner))
     }).unwrap();
 
     match command {
-        cli::Commands::Test { list } => {
-            println!("Test {}", list);
-        },
         cli::Commands::Run(run_args) => with_tokio(rune::run_script(run_args.input)),
     }
 }

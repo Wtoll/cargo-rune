@@ -132,6 +132,7 @@ name = "cargo-rune"
 version = "0.2.0"
 dependencies = [
  "clap",
+ "clap-cargo",
  "clio",
  "lazy_static",
  "rune",
@@ -162,6 +163,16 @@ checksum = "fd60e63e9be68e5fb56422e397cf9baddded06dae1d2e523401542383bc72a9f"
 dependencies = [
  "clap_builder",
  "clap_derive",
+]
+
+[[package]]
+name = "clap-cargo"
+version = "0.15.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d546f0e84ff2bfa4da1ce9b54be42285767ba39c688572ca32412a09a73851e5"
+dependencies = [
+ "anstyle",
+ "clap",
 ]
 
 [[package]]
